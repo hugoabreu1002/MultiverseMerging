@@ -1,0 +1,33 @@
+{
+  "params": {
+    "alpha": 0.3,
+    "beta": 2.5,
+    "a_contact": 0.3,
+    "d_init": 3.0,
+    "v_init": 0.3,
+    "N_universes": 2,
+    "Omega_m_univ": 0.315,
+    "Omega_r_univ": 9.2e-05,
+    "Omega_k_univ": 0.0,
+    "H0_univ": 67.4,
+    "z_max": 10.0,
+    "n_steps": 500,
+    "tol": 1e-08
+  },
+  "chi2_model": 283390405.05599904,
+  "chi2_lcdm": 284393983.1737459,
+  "bic_merger": 283390421.96036786,
+  "bic_lcdm": 284393994.4433251,
+  "aic_merger": 283390411.05599904,
+  "aic_lcdm": 284393987.1737459,
+  "H0_model": 1382.2949185766113,
+  "Omega_m_model": 0.9967973122297836,
+  "Omega_DE_model": 0.0,
+  "hubble_tension": {
+    "H0_model": 67.4,
+    "H0_Planck": 67.4,
+    "H0_Riess": 73.04,
+    "delta_vs_Planck": 0.0,
+    "delta_vs_Riess": -5.640000000000001
+  }
+}
