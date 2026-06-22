@@ -26,6 +26,7 @@ class MergerModel:
         self.alpha = self.params.get('alpha', 1.0)
         self.beta = self.params.get('beta', 2.0)
         self.a_contact = self.params.get('a_contact', 0.5)
+        self.N_universes = self.params.get('N_universes', 1)
 
         self.label = (f"merger_N{self.params.get('N_universes',2)}_"
                       f"a{self.alpha:.2e}_b{self.beta:.1f}_"
@@ -37,11 +38,38 @@ class MergerModel:
 
     def solve(self):
         """Solve Friedmann equation with interface-generated DE."""
-        rho_DE_func = get_rho_DE_func(
-            alpha=self.alpha,
-            a_contact=self.a_contact,
-            beta=self.beta
-        )
+        # Choose single- or multi-universe rho_DE function
+        if self.params.get('N_universes', 1) <= 1:
+            rho_DE_func = get_rho_DE_func(
+                alpha=self.alpha,
+                a_contact=self.a_contact,
+                beta=self.beta
+            )
+        else:
+            rho_DE_func = get_rho_DE_func if False else None
+            # Use multi-universe builder from interface
+            rho_DE_func = get_rho_DE_func  # fallback
+            try:
+                rho_DE_func = get_rho_DE_func  # keep reference
+            except Exception:
+                pass
+            # Construct multi-universe function
+            from .interface import get_rho_DE_multi
+            alpha_list = self.params.get('alpha_list', None)
+            a_contact_list = self.params.get('a_contact_list', None)
+            beta_list = self.params.get('beta_list', None)
+            a_contact_spread = self.params.get('a_contact_spread', 0.2)
+
+            rho_DE_func = get_rho_DE_multi(
+                N_universes=self.params.get('N_universes', 2),
+                alpha=self.alpha,
+                a_contact=self.a_contact,
+                beta=self.beta,
+                smoothness=self.params.get('smoothness', 10.0),
+                a_contact_spread=a_contact_spread,
+                alpha_list=alpha_list,
+                beta_list=beta_list
+            )
         self.universe.solve(rho_DE_func=rho_DE_func)
 
         z = self.universe.z_arr
@@ -115,7 +143,7 @@ class MergerModel:
         for k, v in self.params.items():
             print(f"  {k}: {v}")
         if self.results:
-            print(f"\n  H0 = {self.results['H_km_s_Mpc'][-1]:.2f} km/s/Mpc")
-            print(f"  Omega_m = {self.results['Omega_m'][-1]:.4f}")
-            print(f"  Omega_DE = {self.results['Omega_DE'][-1]:.4f}")
+            print(f"\n  H0 = {self.results['H_km_s_Mpc'][0]:.2f} km/s/Mpc")
+            print(f"  Omega_m = {self.results['Omega_m'][0]:.4f}")
+            print(f"  Omega_DE = {self.results['Omega_DE'][0]:.4f}")
         print("=" * 60)

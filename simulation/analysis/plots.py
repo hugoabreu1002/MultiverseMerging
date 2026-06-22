@@ -388,6 +388,81 @@ def plot_jwst_mass_function(model, jwst_data, label_prefix=''):
     plt.close(fig)
 
 
+def plot_multi_universe_contributions(model, label_prefix=''):
+    """
+    Plot per-universe contributions to rho_DE(a) and the total.
+    """
+    try:
+        from model import config
+        from model.interface import rho_DE_interface
+    except Exception:
+        from ..model import config
+        from ..model.interface import rho_DE_interface
+
+    params = model.params.copy()
+    N = params.get('N_universes', 1)
+    if N <= 1:
+        print('  Single-universe model: no per-universe plot.')
+        return
+
+    # Determine per-universe alphas and contact times
+    alpha_list = params.get('alpha_list', None)
+    a_contact_list = params.get('a_contact_list', None)
+    beta = params.get('beta', 2.0)
+    smooth = params.get('smoothness', 10.0)
+
+    if alpha_list is None:
+        alpha_list = [params.get('alpha', 1.0) / float(N)] * N
+    if a_contact_list is None:
+        a_contact = params.get('a_contact', 0.5)
+        a_contact_spread = params.get('a_contact_spread', 0.2)
+        a_max = min(1.0, a_contact + abs(a_contact_spread))
+        a_contact_list = list(np.linspace(a_contact, a_max, N))
+
+    # Build a grid of scale factors
+    z = model.results['z']
+    a = model.results['a']
+
+    # Compute normalization same as in get_rho_DE_multi
+    fracs_at_1 = [rho_DE_interface(1.0, alpha=1.0, a_contact=ac, beta=beta, smoothness=smooth)
+                  for ac in a_contact_list]
+    weighted_total = sum([alpha_list[i] * fracs_at_1[i] for i in range(N)])
+    if abs(weighted_total) < 1e-12:
+        weighted_total = 1e-12
+    # Compute target density
+    Omega_m = config.MERGER_DEFAULTS['Omega_m_univ']
+    Omega_r = config.MERGER_DEFAULTS['Omega_r_univ']
+    Omega_L = 1.0 - Omega_m - Omega_r
+    H0 = config.MERGER_DEFAULTS['H0_univ'] * config.km_s_Mpc_to_1_per_s
+    rho_crit0 = 3.0 * H0**2 / (8.0 * np.pi * config.G)
+    rho_target = Omega_L * rho_crit0
+    norm = rho_target / weighted_total
+
+    # Compute contributions
+    contributions = []
+    for i in range(N):
+        frac = rho_DE_interface(a, alpha=1.0, a_contact=a_contact_list[i], beta=beta, smoothness=smooth)
+        contributions.append(alpha_list[i] * frac * norm)
+
+    total = np.sum(contributions, axis=0)
+
+    fig, ax = plt.subplots(1, 1, figsize=(10, 5))
+    ax.plot(a, total, 'k-', linewidth=2, label='Total ρ_DE')
+    cmap = plt.cm.viridis(np.linspace(0.2, 0.9, N))
+    for i in range(N):
+        ax.plot(a, contributions[i], color=cmap[i], linestyle='--', label=f'Universe {i+1}')
+
+    ax.set_xlabel('Scale factor a', fontsize=12)
+    ax.set_ylabel('ρ_DE(a) [kg/m³]', fontsize=12)
+    ax.set_yscale('log')
+    ax.legend(fontsize=8)
+    ax.grid(True, alpha=0.3)
+    plt.suptitle('Per-universe Dark Energy Contributions', fontsize=14)
+    plt.tight_layout()
+    savefig(fig, f'{label_prefix}multi_universe_contributions.png')
+    plt.close(fig)
+
+
 def plot_summary_panel(model, sne_data=None, jwst_data=None, label_prefix=''):
     """
     Create a comprehensive summary figure with key results.
@@ -533,6 +608,14 @@ def plot_all(model, sne_data=None, jwst_data=None, hz_data=None,
     plot_growth_comparison(model, growth_data, label_prefix)
     plot_cosmic_age(model, label_prefix)
     plot_summary_panel(model, sne_data, jwst_data, label_prefix)
+
+    # Per-universe contributions (if multi-universe)
+    try:
+        N_univ = model.params.get('N_universes', 1)
+        if N_univ and N_univ > 1:
+            plot_multi_universe_contributions(model, label_prefix=label_prefix)
+    except Exception:
+        pass
 
     if jwst_data is not None:
         plot_jwst_mass_function(model, jwst_data, label_prefix)

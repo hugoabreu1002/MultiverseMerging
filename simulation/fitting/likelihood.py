@@ -160,6 +160,8 @@ def total_log_likelihood(model, sne_data, jwst_data=None, hz_data=None,
         # Model prediction: more time → higher mass function
         # Simple phenomenological model: log_phi ∝ log(t_model / t_lcdm)
         t_ratio = t_model / (lcdm_t + 1e-30)
+        # Guard against non-positive ratios
+        t_ratio = np.maximum(t_ratio, 1e-12)
         log_phi_model = np.array(jwst_data['log_phi']) + np.log10(t_ratio)
 
         log_phi_data = np.array(jwst_data['log_phi'])

@@ -88,16 +88,75 @@ def get_rho_DE_func(alpha=1.0, a_contact=0.5, beta=2.0, smoothness=10.0):
     rho_crit0 = 3.0 * H0**2 / (8.0 * np.pi * config.G)
     rho_target = Omega_L * rho_crit0
 
-    # Compute interface function at a=1 for normalization
-    frac_at_1 = rho_DE_interface(1.0, alpha, a_contact, beta, smoothness)
-    if abs(frac_at_1) < 1e-30:
-        frac_at_1 = 1e-30
+    # Compute interface function at a=1 for normalization using alpha=1
+    # so that `alpha` acts as a relative amplitude (not part of the
+    # normalization denominator). This avoids dividing by a value
+    # that could be numerically ~0 when the interface is nearly off at a=1.
+    frac_at_1 = rho_DE_interface(1.0, alpha=1.0, a_contact=a_contact,
+                                 beta=beta, smoothness=smoothness)
+    weighted = alpha * frac_at_1
+    # Safety floor to avoid pathologically large normalization
+    if abs(weighted) < 1e-12:
+        weighted = 1e-12
 
-    # Normalization factor: ensures rho_DE(1) = rho_target
-    norm = rho_target / frac_at_1
+    # Normalization factor: ensures rho_DE(1) = Omega_L * rho_crit0
+    norm = rho_target / weighted
 
     def rho_DE_func(a):
-        frac = rho_DE_interface(a, alpha, a_contact, beta, smoothness)
-        return frac * norm
+        frac = rho_DE_interface(a, alpha=1.0, a_contact=a_contact,
+                                 beta=beta, smoothness=smoothness)
+        return alpha * frac * norm
+
+    return rho_DE_func
+
+
+def get_rho_DE_multi(N_universes=2, alpha=1.0, a_contact=0.5, beta=2.0,
+                     smoothness=10.0, a_contact_spread=0.2, alpha_list=None,
+                     beta_list=None):
+    """
+    Construct a rho_DE(a) that is the sum of contributions from multiple
+    external universes. By default contributions are staggered in contact
+    time across a small range and share the same beta; amplitudes share
+    the provided `alpha` (split evenly) unless `alpha_list` is given.
+    """
+    # Compute target density (same calibration as get_rho_DE_func)
+    Omega_m = config.MERGER_DEFAULTS['Omega_m_univ']
+    Omega_r = config.MERGER_DEFAULTS['Omega_r_univ']
+    Omega_L = 1.0 - Omega_m - Omega_r
+    H0 = config.MERGER_DEFAULTS['H0_univ'] * config.km_s_Mpc_to_1_per_s
+    rho_crit0 = 3.0 * H0**2 / (8.0 * np.pi * config.G)
+    rho_target = Omega_L * rho_crit0
+
+    # Build per-universe parameter lists
+    if N_universes <= 1:
+        return get_rho_DE_func(alpha=alpha, a_contact=a_contact,
+                               beta=beta, smoothness=smoothness)
+
+    if alpha_list is None:
+        alpha_list = [alpha / float(N_universes)] * N_universes
+    if beta_list is None:
+        beta_list = [beta] * N_universes
+
+    # Stagger contact times between a_contact and min(1.0, a_contact+a_contact_spread)
+    a_max = min(1.0, a_contact + abs(a_contact_spread))
+    a_contacts = np.linspace(a_contact, a_max, N_universes)
+
+    # Compute per-universe fraction at a=1 (with alpha=1) and build weighted sum
+    fracs_at_1 = [rho_DE_interface(1.0, alpha=1.0, a_contact=ac,
+                                   beta=beta_list[i], smoothness=smoothness)
+                  for i, ac in enumerate(a_contacts)]
+
+    weighted_total = sum([alpha_list[i] * fracs_at_1[i] for i in range(N_universes)])
+    if abs(weighted_total) < 1e-12:
+        weighted_total = 1e-12
+    norm = rho_target / weighted_total
+
+    def rho_DE_func(a):
+        total = 0.0
+        for i in range(N_universes):
+            frac = rho_DE_interface(a, alpha=1.0, a_contact=a_contacts[i],
+                                     beta=beta_list[i], smoothness=smoothness)
+            total += alpha_list[i] * frac
+        return norm * total
 
     return rho_DE_func

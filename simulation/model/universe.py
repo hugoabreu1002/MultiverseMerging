@@ -124,6 +124,11 @@ class Universe:
         integrand = 1.0 / (a_use**3 * H_use**3)
         integral = cumulative_trapezoid(integrand, a_use, initial=0)
         D = H_use * integral
+        # Regularize to avoid zeros/division issues
+        eps = 1e-12
+        D = np.maximum(D, eps)
+        if D[-1] <= 0:
+            D[-1] = eps
         D /= D[-1]
         return np.interp(z, z_use[::-1], D[::-1])
 
@@ -133,7 +138,13 @@ class Universe:
         mask = self.a_arr > 1e-4
         a = self.a_arr[mask]
         D = self.growth_factor(self.z_arr[mask])
+        # Ensure D is finite and positive
+        eps = 1e-12
+        D = np.maximum(D, eps)
         dD_da = np.gradient(D, a)
-        f = np.where(D > 1e-30, a / D * dD_da, 0.0)
+        f_raw = a / D * dD_da
+        # Replace NaNs/infs with zero
+        f_raw = np.nan_to_num(f_raw, nan=0.0, posinf=0.0, neginf=0.0)
+        f = np.where(D > eps, f_raw, 0.0)
         z_use = self.z_arr[mask]
         return np.interp(z, z_use[::-1], f[::-1])

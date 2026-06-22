@@ -101,13 +101,16 @@ def main():
     # --- Run MCMC if requested ---
     if args.mcmc:
         print("\n[3/5] Running MCMC parameter estimation...")
-        n_steps = 500 if args.quick else 2000
-        n_burn = 100 if args.quick else 500
+        n_steps = 500 if args.quick else 1000
+        n_burn = 100 if args.quick else 250
 
         mcmc = MergerMCMC(
             sne_data=sne_data,
             jwst_data=jwst_data,
             free_params=['alpha', 'a_contact', 'beta'],
+            multi_universe=(params.get('N_universes', 1) > 1),
+            N_universes=params.get('N_universes', 1),
+            hierarchical=(params.get('N_universes', 1) > 1),
             n_steps=n_steps,
             n_burn=n_burn,
             n_walkers=32
@@ -235,9 +238,9 @@ def main():
         'bic_lcdm': float(bic_lcdm),
         'aic_merger': float(aic_merger),
         'aic_lcdm': float(aic_lcdm),
-        'H0_model': float(model.results['H_km_s_Mpc'][-1]),
-        'Omega_m_model': float(model.results['Omega_m'][-1]),
-        'Omega_DE_model': float(model.results['Omega_DE'][-1]),
+        'H0_model': float(model.results['H_km_s_Mpc'][0]),
+        'Omega_m_model': float(model.results['Omega_m'][0]),
+        'Omega_DE_model': float(model.results['Omega_DE'][0]),
         'hubble_tension': hubble_metric,
     }
 
