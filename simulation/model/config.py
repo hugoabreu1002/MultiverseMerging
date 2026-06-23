@@ -43,6 +43,16 @@ MERGER_DEFAULTS = {
     'Omega_k_univ': 0.0,
     'H0_univ': 67.4,       # km/s/Mpc
 
+    # Foreign dark matter parameters
+    'include_foreign_dm': False,  # enable foreign DM from merging universes
+    'geometry': '5D',            # '5D' for spatial brane, '4D' for temporal quantum
+    'alpha_dm': 0.15,           # DM coupling strength
+    'beta_dm': 1.5,             # DM growth exponent after contact
+    'overdensity_factor': 1.0,  # enhancement in high-density regions
+    'tunneling_scale': 0.15,    # quantum tunneling scale (4D model)
+    'time_dilation_enhancement': 0.0,  # time dilation boost (4D model)
+    'interference_scale': 0.2,  # quantum interference scale (4D model)
+
     # Numerical
     'z_max': 20.0,          # maximum redshift for integration
     'n_steps': 10000,       # number of time steps

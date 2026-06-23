@@ -1,6 +1,7 @@
 """
 Single universe Friedmann dynamics.
 Uses direct integration on a uniform redshift grid.
+Supports optional foreign dark matter from merging universes.
 """
 
 import numpy as np
@@ -31,32 +32,53 @@ class Universe:
         self.rho_m_arr = None
         self.rho_r_arr = None
         self.rho_DE_arr = None
+        # Foreign dark matter arrays
+        self.rho_DM_foreign_arr = None
+        self.rho_m_local_arr = None
 
-    def solve(self, rho_DE_func=None):
+    def solve(self, rho_DE_func=None, rho_DM_foreign_func=None):
         n_steps = self.params['n_steps']
         z_max = self.params['z_max']
         self.z_arr = np.linspace(0, z_max, n_steps)
         self.a_arr = 1.0 / (1.0 + self.z_arr)
 
-        rho_m_arr = self.rho_crit0 * self.Omega_m * (1 + self.z_arr)**3
+        # Local matter (baryonic + CDM intrinsic to this universe)
+        # This excludes foreign DM from other universes
+        rho_m_local_arr = self.rho_crit0 * self.Omega_m * (1 + self.z_arr)**3
         rho_r_arr = self.rho_crit0 * self.Omega_r * (1 + self.z_arr)**4
 
+        # Dark energy
         if rho_DE_func is not None:
             self.rho_DE_arr = np.array([rho_DE_func(a) for a in self.a_arr])
             self.rho_DE_arr = np.maximum(self.rho_DE_arr, 0.0)
         else:
             self.rho_DE_arr = self.rho_crit0 * self.Omega_Lambda * np.ones_like(self.z_arr)
 
-        rho_total = rho_m_arr + rho_r_arr + self.rho_DE_arr
+        # Foreign dark matter from merging universes
+        if rho_DM_foreign_func is not None:
+            self.rho_DM_foreign_arr = np.array([rho_DM_foreign_func(a) for a in self.a_arr])
+            self.rho_DM_foreign_arr = np.maximum(self.rho_DM_foreign_arr, 0.0)
+        else:
+            self.rho_DM_foreign_arr = np.zeros_like(self.z_arr)
+
+        self.rho_m_local_arr = rho_m_local_arr
+
+        # Total matter: local + foreign DM
+        rho_m_total = rho_m_local_arr + self.rho_DM_foreign_arr
+
+        # Total density driving expansion
+        rho_total = rho_m_total + rho_r_arr + self.rho_DE_arr
         H_raw = np.sqrt(8.0 * np.pi * config.G * rho_total / 3.0)
 
         # Normalize so that H(z=0) = self.H0
-        # Only scale rho_DE; matter/radiation already use self.rho_crit0
         H0_raw = H_raw[0]
         if H0_raw > 0:
             scale = (self.H0 / H0_raw)**2
+            # Scale both DE and foreign DM to preserve their relative shapes
             self.rho_DE_arr *= scale
-            rho_total = rho_m_arr + rho_r_arr + self.rho_DE_arr
+            self.rho_DM_foreign_arr *= scale
+            rho_m_total = rho_m_local_arr + self.rho_DM_foreign_arr
+            rho_total = rho_m_total + rho_r_arr + self.rho_DE_arr
             H_raw = np.sqrt(8.0 * np.pi * config.G * rho_total / 3.0)
 
         self.H_arr = H_raw
@@ -66,12 +88,14 @@ class Universe:
         t_from_zmax = cumulative_trapezoid(integrand[::-1], self.z_arr[::-1], initial=0)
         self.t_arr = t_from_zmax[::-1]
 
-        self.rho_m_arr = rho_m_arr
+        self.rho_m_arr = rho_m_total  # rho_m_arr now = total matter (local + foreign)
         self.rho_r_arr = rho_r_arr
         return {
             'z': self.z_arr, 'a': self.a_arr, 't': self.t_arr,
-            'H': self.H_arr, 'rho_m': rho_m_arr, 'rho_r': rho_r_arr,
+            'H': self.H_arr, 'rho_m': rho_m_total, 'rho_r': rho_r_arr,
             'rho_DE': self.rho_DE_arr,
+            'rho_DM_foreign': self.rho_DM_foreign_arr,
+            'rho_m_local': rho_m_local_arr,
         }
 
     def H_of_z(self, z):
