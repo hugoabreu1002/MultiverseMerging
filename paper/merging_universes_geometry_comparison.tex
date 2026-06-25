@@ -29,7 +29,7 @@
 \maketitle
 
 \begin{abstract}
-We present a physically rigorous comparison of two competing multiverse geometries within the framework of merging universes as an alternative to the standard $\Lambda$CDM cosmological model. In the first geometry (\textbf{5D Spatial Brane}), universes are 3-dimensional branes separated along a fifth spatial axis; dark energy emerges from the overlap volume of these branes at late cosmic times, and dark matter may arise from actual foreign matter crossing the spatial gap during the merger. In the second geometry (\textbf{4D Temporal Quantum Multiverse}), no extra spatial dimension exists---instead, the multiverse is structured across quantum time, with each universe representing a quantum history in the Wheeler-DeWitt wavefunction; dark energy originates from constructive vacuum interference between neighboring time-slices, and dark matter results from quantum tunneling of matter across time-slice boundaries, with a natural enhancement in regions of strong gravitational time dilation. We implement both models within a modified Friedmann framework, calibrating them against simulated Pantheon+ SN Ia data, and compute Bayesian information criteria (BIC) to discriminate between the four variants (5D DE-only, 5D+DM, 4D DE-only, 4D+DM). The 5D spatial brane model with dark energy only provides the best fit ($\Delta\chi^2 \approx -1.1\times10^{6}$ relative to $\Lambda$CDM), while the 4D temporal model underperforms with the current calibration. The 5D+DM variant partially alleviates the Hubble tension, yielding $H_0 = 69.6$~km/s/Mpc versus Planck's $67.4$~km/s/Mpc and Riess's $73.0$~km/s/Mpc. These results suggest that a spatially-extended multiverse geometry is more cosmologically viable than a purely temporal one, while the foreign dark matter hypothesis remains a promising avenue for future high-redshift observations.
+We present a physically rigorous comparison of two competing multiverse geometries within the framework of merging universes as an alternative to the standard $\Lambda$CDM cosmological model. In the first geometry (\textbf{5D Spatial Brane}), universes are 3-dimensional branes separated along a fifth spatial axis; dark energy emerges from the overlap volume of these branes at late cosmic times, and dark matter may arise from actual foreign matter crossing the spatial gap during the merger. In the second geometry (\textbf{4D Temporal Quantum Multiverse}), no extra spatial dimension exists---instead, the multiverse is structured across quantum time, with each universe representing a quantum history in the Wheeler-DeWitt wavefunction; dark energy originates from constructive vacuum interference between neighboring time-slices, and dark matter results from quantum tunneling of matter across time-slice boundaries, with a natural enhancement in regions of strong gravitational time dilation. We implement both models within a modified Friedmann framework, calibrating them against simulated Pantheon+ SN Ia data, and compute Bayesian information criteria (BIC) to discriminate between the four variants (5D DE-only, 5D+DM, 4D DE-only, 4D+DM). In this simplified, simulated-data comparison, the 5D spatial brane model with dark energy only yields the lowest $\chi^2$ and the largest separation from the $\Lambda$CDM baseline ($\Delta\chi^2 \approx -1.1\times10^{6}$), while the 4D temporal model underperforms with the current calibration. The 5D+DM variant partially alleviates the Hubble tension, yielding $H_0 = 69.6$~km/s/Mpc versus Planck's $67.4$~km/s/Mpc and Riess's $73.0$~km/s/Mpc. These results should be interpreted as preliminary diagnostics of a phenomenological framework rather than definitive observational evidence, but they do suggest that a spatially-extended multiverse geometry is more cosmologically viable than a purely temporal one, while the foreign dark matter hypothesis remains a promising avenue for future high-redshift observations.
 \end{abstract}
 
 \section{Introduction}
@@ -42,7 +42,7 @@ Alongside the Hubble tension, the cosmological constant problem---a discrepancy 
 
 The concept of a multiverse---whether realized through baby universe creation in quantum gravity~\cite{hamada2022}, mirror universe extensions of spacetime symmetry~\cite{tan}, or extra time dimensions~\cite{singh2025}---offers a natural setting for interactions between neighboring universes that could generate the observed dark sector phenomenology. Hamada, Kawai, and Kawana~\cite{hamada2022} showed that in a third-quantized Lorentzian multiverse, the Coleman mechanism can successfully tune the cosmological constant to nearly zero through mother universe creation. Tan~\cite{tan} derived a novel space-time transformation revealing a mirror universe as a complex extension of 4D spacetime, providing a potential explanation for dark matter as mirror baryons. Singh~\cite{singh2025} explored the possibility of extra time-like dimensions within a 6D spacetime framework based on non-commutative geometry.
 
-The Merging Universes framework builds upon these foundations by proposing that both dark energy and dark matter arise from a single physical mechanism: the dynamical interaction between neighboring universes during a merger event. Unlike the $\Lambda$CDM model, where dark energy and dark matter are entirely separate and unrelated components, this framework unifies the dark sector through the geometry of multiverse interactions. In this work, we extend the merging universes framework by introducing a \textit{foreign dark matter} component---physical matter from other universes that becomes gravitationally coupled to ours---and by comparing two fundamentally different geometric interpretations of the multiverse: the original 5D spatial brane picture, and a new 4D temporal quantum multiverse.
+The Merging Universes framework builds upon these foundations by proposing that both dark energy and dark matter arise from a single physical mechanism: the dynamical interaction between neighboring universes during a merger event. Unlike the $\Lambda$CDM model, where dark energy and dark matter are entirely separate and unrelated components, this framework unifies the dark sector through the geometry of multiverse interactions. In this work, we extend the merging universes framework by introducing a \textit{foreign dark matter} component---physical matter from other universes that becomes gravitationally coupled to ours---and by comparing two fundamentally different geometric interpretations of the multiverse: the original 5D spatial brane picture, and a new 4D temporal quantum multiverse. Although the present implementation remains phenomenological, it is organized around physically motivated ingredients: geometric overlap in the 5D brane picture and quantum overlap or tunneling in the 4D temporal picture. This makes the framework less ad hoc than a purely empirical fit while preserving the conceptual distinction between the two geometries.
 
 \section{Theoretical Framework}
 
@@ -97,7 +97,7 @@ where $\gamma$ parameterizes the time-dilation enhancement.
 
 \section{Simulation and Methodology}
 
-We implement both geometries and their DE-only and DE+DM variants within a unified numerical framework. The code solves the Friedmann equation~\eqref{eq:friedmann} on a redshift grid from $z=0$ to $z=10$ with $n=5000$ steps. The scale factor at first contact is set to $a_{\rm contact}=0.3$, corresponding to $z_{\rm contact}\approx 2.3$.
+We implement both geometries and their DE-only and DE+DM variants within a unified numerical framework. The code solves the Friedmann equation~\eqref{eq:friedmann} on a redshift grid from $z=0$ to $z=10$ with $n=5000$ steps. The scale factor at first contact is set to $a_{\rm contact}=0.3$, corresponding to $z_{\rm contact}\approx 2.3$. Because the current implementation is a phenomenological modified-Friedmann parameterization rather than a full field-theoretic derivation, the fit statistics should be interpreted as comparative diagnostics of the model family rather than as definitive evidence for or against the underlying physics. In particular, we expect the qualitative ranking between the 5D and 4D variants to be more robust than any single numerical value, and we therefore treat the present results as a sensitivity study of the phenomenological assumptions rather than as a final model selection.
 
 \subsection{Data}
 
@@ -125,42 +125,132 @@ Table~\ref{tab:comparison} presents the fit statistics for all four model varian
 
 \begin{table}[H]
 \centering
-\caption{Comparison of model fits to simulated Pantheon+ SN Ia data.}
+\caption{Comparison of model fits to simulated Pantheon+ SN Ia data in the updated quick-mode analysis.}
 \label{tab:comparison}
 \begin{tabular}{lcccc}
 \toprule
 Model & $\chi^2$ & $\Delta\chi^2$ & BIC & $H_0$ [km/s/Mpc] \\
 \midrule
-5D Spatial (DE only) & $2.832\times10^8$ & $-1.116\times10^6$ & $2.832\times10^8$ & 67.4 \\
-5D Spatial + DM     & $2.836\times10^8$ & $-7.505\times10^5$ & $2.836\times10^8$ & 69.6 \\
-4D Temporal (DE only) & $2.851\times10^8$ & $+7.419\times10^5$ & $2.851\times10^8$ & 67.4 \\
-4D Temporal + DM     & $2.851\times10^8$ & $+7.920\times10^5$ & $2.851\times10^8$ & 69.6 \\
-$\Lambda$CDM          & $2.844\times10^8$ & --- & --- & 67.4 \\
+5D Spatial (DE only) & $2.8324\times10^8$ & $-1.1167\times10^6$ & $2.8324\times10^8$ & 67.4 \\
+5D Spatial + DM     & $2.836\times10^8$ & $-7.5\times10^5$ & $2.836\times10^8$ & 69.6 \\
+4D Temporal (DE only) & $2.8509\times10^8$ & $+7.41\times10^5$ & $2.8509\times10^8$ & 67.4 \\
+4D Temporal + DM     & $2.851\times10^8$ & $+7.4\times10^5$ & $2.851\times10^8$ & 69.6 \\
+$\Lambda$CDM          & $2.8436\times10^8$ & --- & --- & 67.4 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The key findings are:
 
-\textbf{The 5D spatial brane model with DE only provides the best fit.} It achieves $\Delta\chi^2 \approx -1.1\times10^6$ relative to $\Lambda$CDM, and yields the lowest BIC among all variants. The 4D temporal models \textit{underperform} compared to $\Lambda$CDM, with positive $\Delta\chi^2$.
+\textbf{The 5D spatial brane model with DE only performs best in the current quick-mode comparison.} It achieves $\Delta\chi^2 \approx -1.1\times10^6$ relative to $\Lambda$CDM, and yields the lowest BIC among the variants considered. The 4D temporal models, by contrast, remain worse than $\Lambda$CDM in this updated analysis, with positive $\Delta\chi^2$.
 
 \textbf{Foreign dark matter improves $H_0$.} Both the 5D+DM and 4D+DM variants yield $H_0 = 69.6$~km/s/Mpc, which sits between the Planck 2018 value of $67.4$~km/s/Mpc and the local measurement of $73.04$~km/s/Mpc. This represents a $\sim 30\%$ reduction in the Hubble tension, consistent with the parametric analyses of the tension's multidimensional structure~\cite{pedrotti2024} and the expectations of models that introduce additional energy components at intermediate redshifts~\cite{kamionkowski2023, poulin2019}.
 
-\textbf{The 5D geometry is favored over 4D.} The spatial brane picture produces dark energy and matter distributions that match the SN Ia distance modulus data more naturally than the temporal quantum interference picture, given the current calibration. This result aligns with the broader theoretical literature favoring 5D geometric approaches to the dark sector~\cite{panigrahi2007, ramirez2025, masarrat2025, silva2024}.
+\textbf{The 5D geometry is favored over 4D in the present comparison.} The spatial brane picture produces dark energy and matter distributions that match the SN Ia distance modulus data more naturally than the temporal quantum interference picture under the current calibration. This trend is also consistent with the broader theoretical literature favoring 5D geometric approaches to the dark sector~\cite{panigrahi2007, ramirez2025, masarrat2025, silva2024}, although the present conclusions should be interpreted as sensitivity-based diagnostics rather than definitive model selection.
 
 \subsection{Foreign Dark Matter Fraction}
 
 The foreign dark matter fraction at $z=0$ for the DM-enabled models is $\Omega_{\rm DM}^{\rm (foreign)} \approx 0.197$, which, when added to the local matter density $\Omega_m^{\rm (local)} \approx 0.295$, gives a total $\Omega_m \approx 0.492$. This is higher than the $\Lambda$CDM value of $\Omega_m = 0.315$, suggesting the need for recalibration of the local matter density when foreign DM is included.
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../simulation/figs/geometry_dm_fraction_comparison.png}
+\caption{Evolution of the foreign dark matter fraction for the 5D and 4D geometries. The 5D model produces a sharper onset near $z_{\rm contact} \approx 2.3$, while the 4D model shows a more gradual quantum-tunneling rise.}
+\label{fig:dm}
+\end{figure}
+
 Figure~\ref{fig:dm} shows the evolution of $\Omega_{\rm DM}^{\rm (foreign)}(z)$ for both geometries. The 5D model produces a sharper onset near $z_{\rm contact} \approx 2.3$, while the 4D model's quantum tunneling gives a more gradual rise.
 
 \subsection{Growth of Structure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../simulation/figs/geometry_growth_comparison.png}
+\caption{Comparison of the growth rate $f\sigma_8(z)$ for the 5D and 4D geometries. The 5D DE-only case tracks $\Lambda$CDM closely, whereas the DM-enabled variants show suppressed growth at low redshift.}
+\label{fig:growth}
+\end{figure}
 
 Figure~\ref{fig:growth} compares the growth rate $f\sigma_8(z)$ for all models. The 5D DE-only model closely tracks $\Lambda$CDM, while the DM-enhanced models show suppressed growth at low redshifts due to the additional matter density. This provides a clear observational discriminant: upcoming DESI and Euclid data on redshift-space distortions can distinguish between these scenarios.
 
 \subsection{Effective Equation of State}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\linewidth]{../simulation/figs/geometry_weff_comparison.png}
+\caption{Effective dark-energy equation of state for the 5D and 4D geometries. The 5D branch crosses $w=-1$ from above near $z\sim0.5$, while the 4D branch crosses from below, illustrating the distinct phenomenology of the two geometries.}
+\label{fig:weff}
+\end{figure}
+
 Figure~\ref{fig:weff} shows the effective dark energy equation of state $w_{\rm eff}(z)$. The 5D model crosses $w=-1$ from above at $z \sim 0.5$, while the 4D model crosses from below. Both models produce time-varying $w(z)$, in contrast to the constant $w=-1$ of $\Lambda$CDM. This time-varying behavior is consistent with recent analyses suggesting that dynamical dark energy may be preferred by the data when the Hubble tension is properly accounted for~\cite{pang2025}. It is a clear prediction for forthcoming dark energy surveys.
+
+\section{Additional Simulation Diagnostics}
+
+To provide a fuller view of the phenomenological comparison, we also include a compact set of the main diagnostic panels generated for the 5D and 4D merger models.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{../simulation/figs/geometry_hubble_comparison.png}
+\end{minipage}\hfill
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{../simulation/figs/geometry_summary_comparison.png}
+\end{minipage}
+\caption{Hubble-parameter comparison and a compact summary panel for the 5D and 4D merger models against $\Lambda$CDM.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{../simulation/figs/merger_cosmic_age.png}
+\end{minipage}\hfill
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{../simulation/figs/merger_dark_energy_evolution.png}
+\end{minipage}
+\caption{Cosmic-age history and dark-energy density evolution for the merger framework.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{../simulation/figs/merger_distance_modulus.png}
+\end{minipage}\hfill
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{../simulation/figs/merger_growth_comparison.png}
+\end{minipage}
+\caption{Distance-modulus predictions and growth-history comparison for the merger models.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{../simulation/figs/merger_hubble_comparison.png}
+\end{minipage}\hfill
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{../simulation/figs/merger_jwst_mass_function.png}
+\end{minipage}
+\caption{Hubble-rate comparison and simulated JWST-style high-redshift mass-function predictions.}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{../simulation/figs/merger_multi_universe_contributions.png}
+\end{minipage}\hfill
+\begin{minipage}{0.48\linewidth}
+\centering
+\includegraphics[width=\linewidth]{../simulation/figs/merger_summary_panel.png}
+\end{minipage}
+\caption{Relative multi-universe interaction contributions and a compact summary of the main merger observables.}
+\end{figure}
 
 \section{Discussion}
 

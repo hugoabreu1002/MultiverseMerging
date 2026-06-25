@@ -30,7 +30,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from model import config
 from model.merger_model import MergerModel
 from data.jwst_queries import load_simulated_jwst_highz_data, load_pantheon_plus_data
-from fitting.likelihood import total_log_likelihood, model_vs_lcdm_chi2, bic, aic
+from fitting.likelihood import total_log_likelihood, model_vs_lcdm_chi2, bic, aic, evaluate_model_grid
 from fitting.mcmc import MergerMCMC
 from analysis.plots import plot_all, plot_corner
 
@@ -52,6 +52,12 @@ def parse_args():
                        help='Label prefix for outputs')
     parser.add_argument('--no-lcdm', action='store_true',
                        help='Skip ΛCDM baseline comparison')
+    parser.add_argument('--geometry', type=str, default='5D', choices=['5D', '4D'],
+                       help='Select the multiverse geometry: 5D or 4D')
+    parser.add_argument('--with-dm', action='store_true',
+                       help='Include foreign dark matter from merging universes')
+    parser.add_argument('--sensitivity', action='store_true',
+                       help='Explore a small robustness sweep over contact time and smoothness')
     return parser.parse_args()
 
 
@@ -62,7 +68,7 @@ def main():
 
     print("=" * 70)
     print("  MERGING UNIVERSES COSMOLOGICAL MODEL")
-    print("  An alternative to ΛCDM with interface-generated dark energy")
+    print("  A phenomenological framework for 5D and 4D multiverse geometries")
     print("=" * 70)
 
     # --- Load data ---
@@ -77,19 +83,24 @@ def main():
     params = config.MERGER_DEFAULTS.copy()
 
     if args.quick:
-        # Quick test parameters
-        params['n_steps'] = 500
+        # Quick test parameters with doubled resolution for a more faithful comparison
+        params['n_steps'] = 5000
         params['z_max'] = 10.0
         params['alpha'] = 0.3
         params['beta'] = 2.5
         params['a_contact'] = 0.3
-        print("  [QUICK MODE] Reduced resolution")
+        print("  [QUICK MODE] Higher-resolution comparison")
     elif args.params:
         # Custom JSON parameters
         custom = json.loads(args.params)
         params.update(custom)
         print(f"  Custom parameters: {custom}")
 
+    params['geometry'] = args.geometry
+    params['include_foreign_dm'] = args.with_dm
+
+    print(f"  Geometry = {params['geometry']}")
+    print(f"  Foreign DM = {'enabled' if params['include_foreign_dm'] else 'disabled'}")
     print(f"  α (coupling) = {params['alpha']:.6e}")
     print(f"  β (amplification) = {params['beta']:.2f}")
     print(f"  d_init = {params['d_init']:.4f}")
@@ -99,6 +110,20 @@ def main():
     print(f"  Ω_m = {params['Omega_m_univ']:.4f}")
 
     # --- Run MCMC if requested ---
+    if args.sensitivity:
+        print("\n[3/5] Running sensitivity sweep over contact time and smoothness...")
+        sweep_results = evaluate_model_grid(
+            params,
+            sne_data,
+            geometry=args.geometry,
+            include_dm=args.with_dm,
+        )
+        best = min(sweep_results, key=lambda item: item['chi2'])
+        print("  Sensitivity summary:")
+        for item in sweep_results:
+            print(f"    a_contact={item['a_contact']:.2f}, smoothness={item['smoothness']:.1f}, chi2={item['chi2']:.2f}")
+        print(f"  Best sensitivity point: a_contact={best['a_contact']:.2f}, smoothness={best['smoothness']:.1f}, chi2={best['chi2']:.2f}")
+
     if args.mcmc:
         print("\n[3/5] Running MCMC parameter estimation...")
         n_steps = 500 if args.quick else 1000

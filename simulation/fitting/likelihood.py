@@ -101,6 +101,42 @@ def chi2_jwst_mass_function(log_phi_model, log_phi_data, log_phi_err):
     return np.sum((residual / log_phi_err)**2)
 
 
+def evaluate_model_grid(base_params, sne_data, geometry='5D', include_dm=False,
+                         a_contact_values=None, smoothness_values=None):
+    """Evaluate a small grid of parameter choices for robustness checks.
+
+    This is a lightweight alternative to a full sampler and is intended for
+    thesis-style sensitivity analysis rather than production-level inference.
+    """
+    from model.merger_model import MergerModel
+
+    if a_contact_values is None:
+        a_contact_values = [0.25, 0.30, 0.35]
+    if smoothness_values is None:
+        smoothness_values = [5.0, 10.0, 15.0]
+
+    results = []
+    for a_contact in a_contact_values:
+        for smoothness in smoothness_values:
+            params = base_params.copy()
+            params['a_contact'] = a_contact
+            params['smoothness'] = smoothness
+            params['geometry'] = geometry
+            params['include_foreign_dm'] = include_dm
+            model = MergerModel(params)
+            model.solve()
+            model.solve_lcdm()
+            mu_model = np.array([model.universe.distance_modulus(z) for z in sne_data['z']])
+            chi2 = chi2_sne(mu_model, sne_data['mu'], sne_data['mu_err'])
+            results.append({
+                'a_contact': a_contact,
+                'smoothness': smoothness,
+                'chi2': float(chi2),
+                'model': model,
+            })
+    return results
+
+
 def total_log_likelihood(model, sne_data, jwst_data=None, hz_data=None,
                           growth_data=None, params=None):
     """
