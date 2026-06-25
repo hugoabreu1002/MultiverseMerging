@@ -1,2 +1,12 @@
 simulation/venv/
 **/__pycache__/**
+.gitignore
+paper/merging_universes_geometry_comparison.aux
+paper/merging_universes_geometry_comparison.blg
+paper/merging_universes_geometry_comparison.log
+paper/merging_universes_geometry_comparison.bbl
+paper/merging_universes_geometry_comparison.out
+paper/refs/
+paper/merging_universes_geometry_comparison.fls
+paper/merging_universes_geometry_comparison.synctex.gz
+paper/merging_universes_geometry_comparison.fdb_latexmk
